@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Rack with debugger",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/Users/peterbuchhop/vcv-dev/Rack/Rack",
+            "args": [],
+            "cwd": "/Users/peterbuchhop/vcv-dev/Rack",
+            "MIMode": "lldb",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "environment": []
+        }
+    ]
+}
