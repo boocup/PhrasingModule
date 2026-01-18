@@ -1,7 +1,8 @@
 {
   "slug": "phrasing-module",
   "name": "Phrasing Module",
-  "version": "0.1.0",
+  "version": "2.0.0",
+  "rackVersion": "2.6.6",
   "license": "MIT",
   "brand": "Pete Buchhop",
   "author": "Pete Buchhop",
