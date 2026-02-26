@@ -288,8 +288,8 @@ struct PhrasingWidget : ModuleWidget {
         addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        const float densityX = 33.f;
-        const float gapJitterX = 73.f;
+        const float densityX = 73.f;
+        const float gapJitterX = 33.f;
         const float durJitterX = 113.f;
         const float guaranteeX = 143.f;
         const float globalY = 58.f;
