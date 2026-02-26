@@ -292,7 +292,7 @@ struct PhrasingWidget : ModuleWidget {
         const float gapJitterX = 33.f;
         const float durJitterX = 113.f;
         const float guaranteeX = 143.f;
-        const float globalY = 58.f;
+        const float globalY = 48.f;
 
         const float lane1X = 22.f;
         const float lane2X = 56.f;
