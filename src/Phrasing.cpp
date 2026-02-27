@@ -29,6 +29,7 @@ struct Phrasing : Module {
         PARAMS_LEN
     };
     enum InputId {
+        DENSITY_CV_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
@@ -61,6 +62,7 @@ struct Phrasing : Module {
         configParam(GAP_JITTER_PARAM, 0.f, 1.f, 0.25f, "Gap Jitter", "%", 0.f, 100.f);
         configParam(DURATION_JITTER_PARAM, 0.f, 1.f, 0.25f, "Duration Jitter", "%", 0.f, 100.f);
         configSwitch(GUARANTEE_ONE_PARAM, 0.f, 1.f, 0.f, "Guarantee one lane", {"Off", "On"});
+        configInput(DENSITY_CV_INPUT, "Density CV");
 
         configButton(LANE1_ACTIVE_PARAM, "Lane 1 Enable");
         configButton(LANE2_ACTIVE_PARAM, "Lane 2 Enable");
@@ -115,6 +117,11 @@ struct Phrasing : Module {
     void process(const ProcessArgs& args) override {
         const float sr = args.sampleRate;
         const float dt = args.sampleTime;
+
+        if (inputs[DENSITY_CV_INPUT].isConnected()) {
+            const float cv = clamp(inputs[DENSITY_CV_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+            params[DENSITY_PARAM].setValue(cv);
+        }
 
         const float density = clamp(params[DENSITY_PARAM].getValue(), 0.f, 1.f);
         const float gapJitter = clamp(params[GAP_JITTER_PARAM].getValue(), 0.f, 1.f);
@@ -292,7 +299,7 @@ struct PhrasingWidget : ModuleWidget {
         const float gapJitterX = 33.f;
         const float durJitterX = 113.f;
         const float guaranteeX = 143.f;
-        const float globalY = 48.f;
+        const float globalY = 40.f;
 
         const float lane1X = 22.f;
         const float lane2X = 56.f;
@@ -310,6 +317,8 @@ struct PhrasingWidget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(Vec(gapJitterX, globalY), module, Phrasing::GAP_JITTER_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(Vec(durJitterX, globalY), module, Phrasing::DURATION_JITTER_PARAM));
         addParam(createParamCentered<CKSS>(Vec(guaranteeX, globalY), module, Phrasing::GUARANTEE_ONE_PARAM));
+
+        addInput(createInputCentered<PJ301MPort>(Vec(densityX, globalY + 36.f), module, Phrasing::DENSITY_CV_INPUT));
 
         addParam(createParamCentered<TL1105>(Vec(lane1X, enY), module, Phrasing::LANE1_ACTIVE_PARAM));
         addParam(createParamCentered<TL1105>(Vec(lane2X, enY), module, Phrasing::LANE2_ACTIVE_PARAM));
