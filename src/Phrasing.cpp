@@ -30,6 +30,10 @@ struct Phrasing : Module {
     };
     enum InputId {
         DENSITY_CV_INPUT,
+        TRIG1_INPUT,
+        TRIG2_INPUT,
+        TRIG3_INPUT,
+        TRIG4_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
@@ -53,6 +57,7 @@ struct Phrasing : Module {
     float gapTimer = 0.f;
     bool initialized = false;
     dsp::SchmittTrigger laneBtnTrig[4];
+    dsp::SchmittTrigger trigIn[4];
     bool laneEnabled[4] = {true, true, true, true};
     bool laneEnabledInit = false;
 
@@ -63,6 +68,10 @@ struct Phrasing : Module {
         configParam(DURATION_JITTER_PARAM, 0.f, 1.f, 0.25f, "Duration Jitter", "%", 0.f, 100.f);
         configSwitch(GUARANTEE_ONE_PARAM, 0.f, 1.f, 0.f, "Guarantee one lane", {"Off", "On"});
         configInput(DENSITY_CV_INPUT, "Density CV");
+        configInput(TRIG1_INPUT, "Trig 1");
+        configInput(TRIG2_INPUT, "Trig 2");
+        configInput(TRIG3_INPUT, "Trig 3");
+        configInput(TRIG4_INPUT, "Trig 4");
 
         configButton(LANE1_ACTIVE_PARAM, "Lane 1 Enable");
         configButton(LANE2_ACTIVE_PARAM, "Lane 2 Enable");
@@ -134,6 +143,7 @@ struct Phrasing : Module {
             clamp(params[WEIGHT3_PARAM].getValue(), 0.f, 1.f),
             clamp(params[WEIGHT4_PARAM].getValue(), 0.f, 1.f)
         };
+
         const float laneDurKnob[4] = {
             clamp(params[LANEDUR1_PARAM].getValue(), 0.f, 1.f),
             clamp(params[LANEDUR2_PARAM].getValue(), 0.f, 1.f),
@@ -169,6 +179,20 @@ struct Phrasing : Module {
         }
         const bool laneActive[4] = { laneEnabled[0], laneEnabled[1], laneEnabled[2], laneEnabled[3] };
 
+        // Trigger inputs force event regardless of bias/weight
+        const float durJitAmt = 0.50f * durJitter;
+        for (int i = 0; i < 4; i++) {
+            if (!laneActive[i]) continue;
+            if (inputs[TRIG1_INPUT + i].isConnected()) {
+                if (trigIn[i].process(inputs[TRIG1_INPUT + i].getVoltage())) {
+                    const float baseDur = knobToSeconds(laneDurKnob[i]);
+                    const float durMul = jitterMul(durJitAmt);
+                    laneOnTimer[i] = std::max(0.f, baseDur * durMul);
+                    laneTarget[i] = 1.f;
+                }
+            }
+        }
+
         if (!initialized) {
             initialized = true;
             const float baseGap0 = densityToGapSeconds(density);
@@ -200,7 +224,6 @@ struct Phrasing : Module {
         }
 
         const float gapJitAmt = 0.30f * gapJitter;
-        const float durJitAmt = 0.50f * durJitter;
         const float baseGap = densityToGapSeconds(density);
         gapTimer -= dt;
         if (gapTimer <= 0.f) {
@@ -311,7 +334,8 @@ struct PhrasingWidget : ModuleWidget {
         const float weightY = 150.f;
         const float laneDurY = 190.f;
         const float floorY = 230.f;
-        const float outY = 270.f;
+        const float outY = 340.f;
+        const float trigY = outY - 35.f;
 
         addParam(createParamCentered<RoundBlackKnob>(Vec(densityX, globalY), module, Phrasing::DENSITY_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(Vec(gapJitterX, globalY), module, Phrasing::GAP_JITTER_PARAM));
@@ -349,6 +373,11 @@ struct PhrasingWidget : ModuleWidget {
         addOutput(createOutputCentered<PJ301MPort>(Vec(lane2X, outY), module, Phrasing::OUT2_OUTPUT));
         addOutput(createOutputCentered<PJ301MPort>(Vec(lane3X, outY), module, Phrasing::OUT3_OUTPUT));
         addOutput(createOutputCentered<PJ301MPort>(Vec(lane4X, outY), module, Phrasing::OUT4_OUTPUT));
+
+        addInput(createInputCentered<PJ301MPort>(Vec(lane1X, trigY), module, Phrasing::TRIG1_INPUT));
+        addInput(createInputCentered<PJ301MPort>(Vec(lane2X, trigY), module, Phrasing::TRIG2_INPUT));
+        addInput(createInputCentered<PJ301MPort>(Vec(lane3X, trigY), module, Phrasing::TRIG3_INPUT));
+        addInput(createInputCentered<PJ301MPort>(Vec(lane4X, trigY), module, Phrasing::TRIG4_INPUT));
     }
 };
 
