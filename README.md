@@ -51,6 +51,29 @@ Primary role: drive VCA gain, mixer levels, Morph 4 macros, wavefolder bias, fil
 - Combine with external LFOs or random sources → hybrid deterministic + probabilistic phrasing
 - Use Guarantee-one mode for constant motion without full silence
 
+## Compatible Physical Modules
+
+THEREELPEET outputs 0–5 V smooth envelopes — ideal for controlling level, dynamics, and timbral parameters on Eurorack modules.
+
+Recommended pairings:
+
+- **VCAs** — Intellijel Quad VCA, Make Noise LxD, 4ms VCA Matrix, Doepfer A-130-8  
+  Patch to gain CV for ducking, spotlighting, crossfades.
+
+- **Mixers / Matrix** — Intellijel Quadrax (via Qx expander), Make Noise Maths (CH. 1/2 CV), 4ms Spherical Wavetable Navigator (morph CV), Mutable Instruments Frames  
+  Control channel levels or macro parameters.
+
+- **Wavefolders / Timbre** — Instruo Tš-L, Mutable Instruments Ripples (FM/CV), Befaco Even VCO (FM index), Joranalogue Fold 6  
+  Slow bias modulation for breathing harmonics.
+
+- **Filters** — Mutable Instruments Ripples/Resonators, Instruo Cš-L (cutoff), Doepfer A-106-5 SEM filter  
+  Gentle cutoff sweeps over long phrases.
+
+- **Multi-function** — Make Noise Maths, 0-Coast contour in, Joranalogue Contour 1, Intellijel Quadrax  
+  Use as external envelope source or modulation depth control.
+
+Best results come from modules that accept unipolar 0–5/0–8/0–10 V CV and respond musically to slow changes.
+
 ## Building
 Requires a working VCV Rack plugin development environment.  
 See: https://vcvrack.com/manual/PluginDevelopmentTutorial
@@ -58,5 +81,6 @@ See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 Clone into `plugins/` directory and run:
 ```bash
 make
+
 
 
