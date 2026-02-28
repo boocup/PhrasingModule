@@ -72,32 +72,26 @@ struct Phrasing : Module {
         configInput(TRIG2_INPUT, "Trig 2");
         configInput(TRIG3_INPUT, "Trig 3");
         configInput(TRIG4_INPUT, "Trig 4");
-
         configButton(LANE1_ACTIVE_PARAM, "Lane 1 Enable");
         configButton(LANE2_ACTIVE_PARAM, "Lane 2 Enable");
         configButton(LANE3_ACTIVE_PARAM, "Lane 3 Enable");
         configButton(LANE4_ACTIVE_PARAM, "Lane 4 Enable");
-
         configParam(WEIGHT1_PARAM, 0.f, 1.f, 0.8f, "Weight I", "%", 0.f, 100.f);
         configParam(WEIGHT2_PARAM, 0.f, 1.f, 0.8f, "Weight II", "%", 0.f, 100.f);
         configParam(WEIGHT3_PARAM, 0.f, 1.f, 0.8f, "Weight III", "%", 0.f, 100.f);
         configParam(WEIGHT4_PARAM, 0.f, 1.f, 0.8f, "Weight IV", "%", 0.f, 100.f);
-
         configParam(LANEDUR1_PARAM, 0.f, 1.f, 0.5f, "Duration I");
         configParam(LANEDUR2_PARAM, 0.f, 1.f, 0.5f, "Duration II");
         configParam(LANEDUR3_PARAM, 0.f, 1.f, 0.5f, "Duration III");
         configParam(LANEDUR4_PARAM, 0.f, 1.f, 0.5f, "Duration IV");
-
         configParam(FLOOR1_PARAM, 0.f, 1.f, 0.0f, "Floor I", "%", 0.f, 100.f);
         configParam(FLOOR2_PARAM, 0.f, 1.f, 0.0f, "Floor II", "%", 0.f, 100.f);
         configParam(FLOOR3_PARAM, 0.f, 1.f, 0.0f, "Floor III", "%", 0.f, 100.f);
         configParam(FLOOR4_PARAM, 0.f, 1.f, 0.0f, "Floor IV", "%", 0.f, 100.f);
-
         configOutput(OUT1_OUTPUT, "Lane CV I");
         configOutput(OUT2_OUTPUT, "Lane CV II");
         configOutput(OUT3_OUTPUT, "Lane CV III");
         configOutput(OUT4_OUTPUT, "Lane CV IV");
-
         configLight(LANE1_LIGHT, "Lane 1");
         configLight(LANE2_LIGHT, "Lane 2");
         configLight(LANE3_LIGHT, "Lane 3");
@@ -143,7 +137,6 @@ struct Phrasing : Module {
             clamp(params[WEIGHT3_PARAM].getValue(), 0.f, 1.f),
             clamp(params[WEIGHT4_PARAM].getValue(), 0.f, 1.f)
         };
-
         const float laneDurKnob[4] = {
             clamp(params[LANEDUR1_PARAM].getValue(), 0.f, 1.f),
             clamp(params[LANEDUR2_PARAM].getValue(), 0.f, 1.f),
@@ -177,9 +170,9 @@ struct Phrasing : Module {
                 }
             }
         }
+
         const bool laneActive[4] = { laneEnabled[0], laneEnabled[1], laneEnabled[2], laneEnabled[3] };
 
-        // Trigger inputs force event regardless of bias/weight
         const float durJitAmt = 0.50f * durJitter;
         for (int i = 0; i < 4; i++) {
             if (!laneActive[i]) continue;
@@ -276,9 +269,10 @@ struct Phrasing : Module {
             if (timeSec <= 0.f) return 0.f;
             return std::exp(-1.f / (timeSec * sr));
         };
+
         for (int i = 0; i < 4; i++) {
             const float laneBaseDur = knobToSeconds(laneDurKnob[i]);
-            const float attackSec = clamp(laneBaseDur * 0.10f, 0.030f, 2.0f);
+            const float attackSec = clamp(laneBaseDur * 0.20f, 0.030f, 2.0f);
             const float releaseSec = clamp(laneBaseDur * 0.40f, 0.300f, 25.0f);
             const float aCoeff = onePoleCoeff(attackSec);
             const float rCoeff = onePoleCoeff(releaseSec);
@@ -312,7 +306,6 @@ struct PhrasingWidget : ModuleWidget {
     PhrasingWidget(Phrasing* module) {
         setModule(module);
         setPanel(createPanel(asset::plugin(pluginInstance, "res/Phrasing.svg")));
-
         addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
@@ -323,12 +316,10 @@ struct PhrasingWidget : ModuleWidget {
         const float durJitterX = 113.f;
         const float guaranteeX = 143.f;
         const float globalY = 40.f;
-
         const float lane1X = 22.f;
         const float lane2X = 56.f;
         const float lane3X = 90.f;
         const float lane4X = 124.f;
-
         const float enY = 105.f;
         const float lightY = 122.f;
         const float weightY = 150.f;
@@ -341,7 +332,6 @@ struct PhrasingWidget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(Vec(gapJitterX, globalY), module, Phrasing::GAP_JITTER_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(Vec(durJitterX, globalY), module, Phrasing::DURATION_JITTER_PARAM));
         addParam(createParamCentered<CKSS>(Vec(guaranteeX, globalY), module, Phrasing::GUARANTEE_ONE_PARAM));
-
         addInput(createInputCentered<PJ301MPort>(Vec(densityX, globalY + 36.f), module, Phrasing::DENSITY_CV_INPUT));
 
         addParam(createParamCentered<TL1105>(Vec(lane1X, enY), module, Phrasing::LANE1_ACTIVE_PARAM));
