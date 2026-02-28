@@ -1,90 +1,60 @@
-# Phrasing Module (Work in Progress)
+# THEREELPEET (Phrasing)
 
-![Phrasing Module panel](doc/image/Phrasing.svg)
+![THEREELPEET panel](res/Phrasing.svg)
 
-**Phrasing Module** is an in-development VCV Rack module focused on **musical phrasing rather than note generation**.
+**THEREELPEET** is a sparse, probabilistic CV generator for VCV Rack.  
+It produces long, breathing phrases — extended rests interrupted by smooth, musical rises and falls — to control presence, spotlighting, and dynamic emphasis across voices.
 
-Instead of producing pitches or step sequences, the module is intended to shape **when things happen and how present they are** — creating pauses, repeats, changes, and dynamic emphasis over time. Its primary role is to introduce *breathing* and *form* into generative or semi-generative patches.
-
-This project is currently exploratory and evolving. Expect breaking changes.
+Not a sequencer. Not a trigger module.  
+A form and breathing tool meant to sit above your sound generators.
 
 The module is licensed under the [MIT license](./LICENSE).
 
----
+## Overview
 
-## Concept
+THEREELPEET creates four independent, slow-moving CV envelopes that decide **when** a voice should be present and **how present** it should be.
 
-Most modular systems are very good at generating material, but much weaker at shaping **structure**:
+Each lane fires probabilistically on a global timed gap (controlled by Density), or can be forced on via a trig input.  
+Outputs are shaped with attack and release times derived from the Duration knob, using one-pole smoothing for natural fades.
 
-- when something rests  
-- when it repeats  
-- when it changes  
-- when one voice comes forward and others recede  
+Primary role: drive VCA gain, mixer levels, Morph 4 macros, wavefolder bias, filter cutoff, or any parameter that benefits from slow, organic phrasing and ducking.
 
-Phrasing Module is designed to sit **above** note, rhythm, or sound generation and act as a **form and presence controller**.
+## Controls & I/O
 
-A primary intended use is driving **level CV inputs** on modules such as Morph 4 or VCAs, creating spotlighting, crossfades, ducking, and ensemble-style dynamics.
+### Global
+- **Density** — knob + CV input (0–10 V)  
+  Higher = shorter gaps between events (5–90 s base range, logarithmic)
+- **Gap Jitter** — adds timing variation per event
+- **Dur Jitter** — adds variation to on-time per event
+- **Guarantee one** — switch: ensures at least one lane is always active (picks highest-weight lane)
 
----
+### Per lane (×4)
+- **Enable** toggle button + green activity light
+- **Weight** — probability of firing during a gap event (0–1)
+- **Duration** — base on-time (5–90 s logarithmic)
+- **Floor** — minimum output level when lane is inactive (0–5 V)
+- **Trig input** — rising edge (> ~1.7 V) forces lane on for full (jittered) duration
 
-## Current Direction (Early Design)
+### Outputs
+- Lane CV 1–4 — 0–5 V shaped envelopes
 
-The module is being developed around two complementary ideas:
+## Envelope Behavior
+- Attack time ≈ 20% of Duration knob (clamped 30 ms – 2 s)
+- Release time ≈ 40% of Duration knob (clamped 300 ms – 25 s)
+- One-pole low-pass smoothing applied to target changes
+- Floor parameter sets resting level (no hard off unless floor = 0)
 
-### 1. Gate Phrasing
-Incoming clocks or gates are transformed into phrased gate output that may:
-
-- Pause (insert rests)
-- Repeat (hold the current state)
-- Change (force transitions)
-- Extend (occasionally hold gates longer than expected)
-
-These behaviors are probabilistic and clock-aware, rather than step-based.
-
-### 2. Level / Presence Control
-Instead of pitch CV, the module outputs **multiple continuous CV signals** intended for level control:
-
-- Coordinated level CVs (e.g. 4 outputs)
-- Smooth fades rather than hard mutes
-- Focus / spotlight behavior (one voice foregrounded, others supporting)
-- Ensemble vs solo balance
-
-These outputs are intended to be patched into mixers, VCAs, or Morph 4-style macro controllers.
-
----
-
-## What This Module Is *Not*
-
-- Not a traditional step sequencer
-- Not a pitch generator
-- Not a pattern recorder
-- Not a melody engine
-
-Those tools already exist. This module exists to make their output **feel intentional and alive**.
-
----
-
-## Status
-
-**Very early work in progress.**
-
-The codebase currently reuses scaffolding and tooling from an earlier generative sequencer project, but much of that logic is being removed or replaced as the phrasing model solidifies.
-
-Expect:
-- rapid refactors
-- deleted features
-- incomplete controls
-- placeholder behavior
-
----
+## Intended Use
+- Patch outputs to VCA gain or mixer channel levels → natural spotlighting / ducking
+- Send to Morph 4 macros → coordinated parameter movement
+- Control wavefolder bias or filter cutoff → slow timbral breathing
+- Combine with external LFOs or random sources → hybrid deterministic + probabilistic phrasing
+- Use Guarantee-one mode for constant motion without full silence
 
 ## Building
+Requires a working VCV Rack plugin development environment.  
+See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 
-To build from source, you need a working VCV Rack development environment. Follow the official guide:
-
-https://vcvrack.com/manual/PluginDevelopmentTutorial
-
-Clone the repository into your Rack `plugins` directory and run:
-
+Clone into `plugins/` directory and run:
 ```bash
 make
