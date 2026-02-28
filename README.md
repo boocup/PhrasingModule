@@ -2,7 +2,7 @@
 
 ![THEREELPEET panel](res/Phrasing.svg)
 
-**THEREELPEET (Phrasing)** is a sparse, probabilistic CV generator for VCV Rack.  
+**THEREELPEET(Phrasing)** is a sparse, probabilistic CV generator for VCV Rack.  
 It produces long, breathing phrases — extended rests interrupted by smooth, musical rises and falls — to control presence, spotlighting, and dynamic emphasis across voices.
 
 Not a sequencer. Not a trigger module.  
@@ -12,7 +12,7 @@ The module is licensed under the [MIT license](./LICENSE).
 
 ## Overview
 
-THEREELPEET (Phrasing) creates four independent, slow-moving CV envelopes that decide **when** a voice should be present and **how present** it should be.
+THEREELPEET(Phrasing) creates four independent, slow-moving CV envelopes that decide **when** a voice should be present and **how present** it should be.
 
 Each lane fires probabilistically on a global timed gap (controlled by Density), or can be forced on via a trig input.  
 Outputs are shaped with attack and release times derived from the Duration knob, using one-pole smoothing for natural fades.
@@ -58,4 +58,5 @@ See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 Clone into `plugins/` directory and run:
 ```bash
 make
+
 
