@@ -1,6 +1,6 @@
 # THEREELPEET (Phrasing)
 
-![THEREELPEET panel](res/PhrasingFulllImage.png)
+![THEREELPEET panel](res/PhrasingFulllImage2.png)
 
 **THEREELPEET** is a sparse, probabilistic CV generator for VCV Rack.  
 It produces long, breathing phrases — extended rests interrupted by smooth, musical rises and falls — to control presence, spotlighting, and dynamic emphasis across voices.
@@ -82,6 +82,7 @@ See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 Clone into `plugins/` directory and run:
 ```bash
 make
+
 
 
 
