@@ -3,6 +3,7 @@
 ![THEREELPEET panel](res/PhrasingFulllImage2.jpg)
 
 [Watch under 3 min demo](https://youtube.com/shorts/_wfb55v9VBA)
+
 [Watch 1 min wip video](https://youtube.com/shorts/kH3QeOVfajg)
 
 **THEREELPEET** Phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.  
