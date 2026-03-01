@@ -2,7 +2,7 @@
 
 ![THEREELPEET panel](res/PhrasingFulllImage3.jpg)
 
-**THEREELPEET** is a sparse, probabilistic CV generator for VCV Rack.  
+**THEREELPEET** Phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.  
 It produces long, breathing phrases — extended rests interrupted by smooth, musical rises and falls — to control presence, spotlighting, and dynamic emphasis across voices.
 
 Not a sequencer. Not a trigger module.  

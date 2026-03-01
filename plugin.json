@@ -17,7 +17,7 @@
     {
       "slug": "phrasing",
       "name": "Phrasing",
-      "description": "Work-in-progress phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.",
+      "description": "Phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.",
       "panel": "res/Phrasing.svg",
       "tags": ["Utility", "Random"]
     }
