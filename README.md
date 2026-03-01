@@ -46,7 +46,6 @@ Primary role: drive VCA gain, mixer levels, Morph 4 macros, wavefolder bias, fil
 
 ## Intended Use
 - Patch outputs to VCA gain or mixer channel levels → natural spotlighting / ducking
-- Send to Morph 4 macros → coordinated parameter movement
 - Control wavefolder bias or filter cutoff → slow timbral breathing
 - Combine with external LFOs or random sources → hybrid deterministic + probabilistic phrasing
 - Use Guarantee-one mode for constant motion without full silence
