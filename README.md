@@ -1,6 +1,6 @@
 # THEREELPEET (Phrasing)
 
-![THEREELPEET panel](res/PhrasingFulllImage3.jpg)
+![THEREELPEET panel](res/PhrasingFulllImage2.jpg)
 
 **THEREELPEET** Phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.  
 It produces long, breathing phrases — extended rests interrupted by smooth, musical rises and falls — to control presence, spotlighting, and dynamic emphasis across voices.
@@ -81,6 +81,7 @@ See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 Clone into `plugins/` directory and run:
 ```bash
 make
+
 
 
 
