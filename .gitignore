@@ -10,7 +10,9 @@
 *.xcf
 
 /build
+/build-mm
 /dep
 /dist
+/metamodule-plugins
 /patches
 res/Blank.svg.zip

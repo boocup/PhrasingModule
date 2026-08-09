@@ -1,0 +1,12 @@
+{
+  "MetaModuleBrandName": "THEREELPEET",
+  "MetaModulePluginMaintainer": "THEREELPEET",
+  "MetaModulePluginMaintainerEmail": "buchhop@icloud.com",
+  "MetaModuleIncludedModules": [
+    {
+      "slug": "phrasing",
+      "name": "Phrasing",
+      "description": "Phrasing and presence controller"
+    }
+  ]
+}
