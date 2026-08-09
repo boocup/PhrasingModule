@@ -144,12 +144,11 @@ struct Phrasing : Module {
         const float sr = args.sampleRate;
         const float dt = args.sampleTime;
 
+        float density = params[DENSITY_PARAM].getValue();
         if (inputs[DENSITY_CV_INPUT].isConnected()) {
-            const float cv = clamp(inputs[DENSITY_CV_INPUT].getVoltage() / 10.f, 0.f, 1.f);
-            params[DENSITY_PARAM].setValue(cv);
+            density = clamp(inputs[DENSITY_CV_INPUT].getVoltage() / 10.f, 0.f, 1.f);
         }
-
-        const float density = clamp(params[DENSITY_PARAM].getValue(), 0.f, 1.f);
+        density = clamp(density, 0.f, 1.f);
         const float gapJitter = clamp(params[GAP_JITTER_PARAM].getValue(), 0.f, 1.f);
         const float durJitter = clamp(params[DURATION_JITTER_PARAM].getValue(), 0.f, 1.f);
         const bool guaranteeOne = params[GUARANTEE_ONE_PARAM].getValue() > 0.5f;
