@@ -15,7 +15,7 @@ include(${METAMODULE_SDK_DIR}/plugin.cmake)
 
 # ====================== Project ======================
 project(PhrasingModule
-    VERSION 2.0
+    VERSION 2.2.0
     DESCRIPTION "Phrasing and presence controller"
     LANGUAGES C CXX
 )

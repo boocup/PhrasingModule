@@ -76,6 +76,8 @@ struct Phrasing : Module {
 
     Phrasing();
     void process(const ProcessArgs& args) override;
+    json_t* dataToJson() override;
+    void dataFromJson(json_t* rootJ) override;
 
     float knobToSeconds(float d);
     float densityToGapSeconds(float density);
@@ -133,6 +135,30 @@ Phrasing::Phrasing() {
     configLight(LANE2_LIGHT_R, "Lane 2");
     configLight(LANE3_LIGHT_R, "Lane 3");
     configLight(LANE4_LIGHT_R, "Lane 4");
+}
+
+json_t* Phrasing::dataToJson() {
+    json_t* rootJ = json_object();
+    json_object_set_new(rootJ, "guaranteeEnabled", json_boolean(guaranteeEnabled));
+    json_t* laneEnabledJ = json_array();
+    for (int i = 0; i < 4; i++)
+        json_array_append_new(laneEnabledJ, json_boolean(laneEnabled[i]));
+    json_object_set_new(rootJ, "laneEnabled", laneEnabledJ);
+    return rootJ;
+}
+
+void Phrasing::dataFromJson(json_t* rootJ) {
+    json_t* guaranteeJ = json_object_get(rootJ, "guaranteeEnabled");
+    if (guaranteeJ)
+        guaranteeEnabled = json_boolean_value(guaranteeJ);
+    json_t* laneEnabledJ = json_object_get(rootJ, "laneEnabled");
+    if (laneEnabledJ) {
+        for (int i = 0; i < 4; i++) {
+            json_t* v = json_array_get(laneEnabledJ, i);
+            if (v)
+                laneEnabled[i] = json_boolean_value(v);
+        }
+    }
 }
 
 void Phrasing::process(const ProcessArgs& args) {
@@ -499,6 +525,29 @@ struct Phrasing : Module {
         configLight(LANE2_LIGHT, "Lane 2");
         configLight(LANE3_LIGHT, "Lane 3");
         configLight(LANE4_LIGHT, "Lane 4");
+    }
+
+    json_t* dataToJson() override {
+        json_t* rootJ = json_object();
+        json_t* laneEnabledJ = json_array();
+        for (int i = 0; i < 4; i++)
+            json_array_append_new(laneEnabledJ, json_boolean(laneEnabled[i]));
+        json_object_set_new(rootJ, "laneEnabled", laneEnabledJ);
+        return rootJ;
+    }
+
+    void dataFromJson(json_t* rootJ) override {
+        json_t* laneEnabledJ = json_object_get(rootJ, "laneEnabled");
+        if (laneEnabledJ) {
+            for (int i = 0; i < 4; i++) {
+                json_t* v = json_array_get(laneEnabledJ, i);
+                if (v)
+                    laneEnabled[i] = json_boolean_value(v);
+            }
+        }
+        // Prevent the first-process() lane-reset guard below from clobbering
+        // the values we just restored.
+        laneEnabledInit = true;
     }
 
     float knobToSeconds(float d) {
