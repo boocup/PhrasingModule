@@ -1,12 +1,14 @@
 {
   "MetaModuleBrandName": "THEREELPEET",
-  "MetaModulePluginMaintainer": "THEREELPEET",
+  "MetaModulePluginMaintainer": "Pete Buchhop",
   "MetaModulePluginMaintainerEmail": "buchhop@icloud.com",
+  "MetaModulePluginMaintainerUrl": "https://github.com/boocup/PhrasingModule",
+  "MetaModuleDescription": "Phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.",
   "MetaModuleIncludedModules": [
     {
       "slug": "phrasing",
       "name": "Phrasing",
-      "description": "Phrasing and presence controller"
+      "displayName": "Phrasing"
     }
   ]
 }
