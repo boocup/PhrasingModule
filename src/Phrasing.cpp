@@ -342,17 +342,7 @@ struct Phrasing : Module {
 struct PhrasingWidget : ModuleWidget {
     PhrasingWidget(Phrasing* module) {
         setModule(module);
-        // MM's module-browser faceplate thumbnail is read via LVGL's raster
-        // image decoder (ModuleDrawer::read_faceplate() in the MM firmware),
-        // not through the SVG/nanosvg path used for in-patch panel drawing --
-        // confirmed by the "Could not load faceplate image" error when this
-        // pointed at the SVG. VCV has no such constraint, so it keeps the
-        // vector panel.
-#ifdef METAMODULE
-        setPanel(createPanel(asset::plugin(pluginInstance, "res/Phrasing.png")));
-#else
         setPanel(createPanel(asset::plugin(pluginInstance, "res/Phrasing.svg")));
-#endif
         addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
