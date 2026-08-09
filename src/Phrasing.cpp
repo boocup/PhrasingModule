@@ -15,8 +15,8 @@ using namespace rack::componentlibrary;
 
 struct Phrasing : Module {
     enum ParamId {
-        GAP_JITTER_PARAM,
         DENSITY_PARAM,
+        GAP_JITTER_PARAM,
         DURATION_JITTER_PARAM,
         GUARANTEE_ONE_PARAM,
         LANE1_ACTIVE_PARAM,
