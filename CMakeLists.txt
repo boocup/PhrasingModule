@@ -29,12 +29,6 @@ target_sources(PhrasingModule PRIVATE
 
 target_include_directories(PhrasingModule PRIVATE src)
 
-# Selects the MetaModule branch in src/Phrasing.cpp (real panel/UX divergence,
-# not a build-path artifact -- see the note at the top of that file).
-target_compile_definitions(PhrasingModule PRIVATE
-    METAMODULE
-)
-
 # ====================== Create Plugin ======================
 create_plugin(
     SOURCE_LIB PhrasingModule
