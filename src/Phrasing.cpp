@@ -3,13 +3,13 @@
 #include <algorithm>
 using namespace rack;
 
-// NOTE: VCV and MetaModule builds still have genuinely different Module
-// behavior (switch vs. momentary-button "guarantee" control, single-color
-// vs. RGB lights) and completely different panel layouts (MM's panel was
-// redesigned from scratch for the MetaModule display). This is a real,
-// confirmed product divergence, not incidental drift, so it's kept as an
-// explicit #ifdef here rather than force-merged. Revisit once the feature
-// set is reconciled (see CLAUDE-PHRASING.md).
+// NOTE: Module behavior (params, lights, persistence) is unified between
+// VCV and MetaModule. The two branches still exist because of genuine,
+// permanent panel differences: MM's widget uses a completely different
+// layout (redesigned from scratch for the MetaModule's display, rotated
+// and rescaled) and its own PNG panel asset, and MM's Density CV jack
+// isn't wired up (no room on the MM panel) even though the underlying
+// input exists on both. Not something to reconcile further.
 #ifdef METAMODULE
 using namespace rack::componentlibrary;
 
@@ -68,11 +68,9 @@ struct Phrasing : Module {
     bool initialized = false;
 
     dsp::SchmittTrigger laneBtnTrig[4];
-    dsp::SchmittTrigger guaranteeBtnTrig;
     dsp::SchmittTrigger trigIn[4];
 
     bool laneEnabled[4] = {true, true, true, true};
-    bool guaranteeEnabled = true;
 
     Phrasing();
     void process(const ProcessArgs& args) override;
@@ -98,7 +96,7 @@ Phrasing::Phrasing() {
     configParam(DENSITY_PARAM, 0.f, 1.f, 0.7f, "Density", "%", 0.f, 100.f);
     configParam(GAP_JITTER_PARAM, 0.f, 1.f, 0.25f, "Gap Jitter", "%", 0.f, 100.f);
     configParam(DURATION_JITTER_PARAM, 0.f, 1.f, 0.25f, "Duration Jitter", "%", 0.f, 100.f);
-    configButton(GUARANTEE_ONE_PARAM, "Guarantee one lane");
+    configSwitch(GUARANTEE_ONE_PARAM, 0.f, 1.f, 0.f, "Guarantee one lane", {"Off", "On"});
 
     configInput(DENSITY_CV_INPUT, "Density CV");
     configInput(TRIG1_INPUT, "Trig 1");
@@ -139,7 +137,6 @@ Phrasing::Phrasing() {
 
 json_t* Phrasing::dataToJson() {
     json_t* rootJ = json_object();
-    json_object_set_new(rootJ, "guaranteeEnabled", json_boolean(guaranteeEnabled));
     json_t* laneEnabledJ = json_array();
     for (int i = 0; i < 4; i++)
         json_array_append_new(laneEnabledJ, json_boolean(laneEnabled[i]));
@@ -148,9 +145,6 @@ json_t* Phrasing::dataToJson() {
 }
 
 void Phrasing::dataFromJson(json_t* rootJ) {
-    json_t* guaranteeJ = json_object_get(rootJ, "guaranteeEnabled");
-    if (guaranteeJ)
-        guaranteeEnabled = json_boolean_value(guaranteeJ);
     json_t* laneEnabledJ = json_object_get(rootJ, "laneEnabled");
     if (laneEnabledJ) {
         for (int i = 0; i < 4; i++) {
@@ -172,9 +166,7 @@ void Phrasing::process(const ProcessArgs& args) {
 
     const float gapJitter = clamp(params[GAP_JITTER_PARAM].getValue(), 0.f, 1.f);
     const float durJitter = clamp(params[DURATION_JITTER_PARAM].getValue(), 0.f, 1.f);
-    if (guaranteeBtnTrig.process(params[GUARANTEE_ONE_PARAM].getValue()))
-        guaranteeEnabled = !guaranteeEnabled;
-    const bool guaranteeOne = guaranteeEnabled;
+    const bool guaranteeOne = params[GUARANTEE_ONE_PARAM].getValue() > 0.5f;
 
     const float laneWeight[4] = {
         clamp(params[WEIGHT1_PARAM].getValue(), 0.f, 1.f),
@@ -357,9 +349,9 @@ void Phrasing::process(const ProcessArgs& args) {
         }
     }
 
-    lights[GUARANTEE_LIGHT_R].setBrightness(guaranteeEnabled ? 1.f : 1.f);
-    lights[GUARANTEE_LIGHT_G].setBrightness(guaranteeEnabled ? 1.f : 0.f);
-    lights[GUARANTEE_LIGHT_B].setBrightness(guaranteeEnabled ? 1.f : 0.f);
+    lights[GUARANTEE_LIGHT_R].setBrightness(guaranteeOne ? 1.f : 1.f);
+    lights[GUARANTEE_LIGHT_G].setBrightness(guaranteeOne ? 1.f : 0.f);
+    lights[GUARANTEE_LIGHT_B].setBrightness(guaranteeOne ? 1.f : 0.f);
 }
 
 float Phrasing::knobToSeconds(float d) {
@@ -414,7 +406,7 @@ PhrasingWidget::PhrasingWidget(Phrasing* module) {
     addParam(createParamCentered<RoundBlackKnob>(Vec(gapJitterX, globalY), module, Phrasing::GAP_JITTER_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(Vec(densityX, globalY), module, Phrasing::DENSITY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(Vec(durJitterX, globalY), module, Phrasing::DURATION_JITTER_PARAM));
-    addParam(createParamCentered<TL1105>(Vec(guaranteeX, guaranteeY), module, Phrasing::GUARANTEE_ONE_PARAM));
+    addParam(createParamCentered<CKSS>(Vec(guaranteeX, guaranteeY), module, Phrasing::GUARANTEE_ONE_PARAM));
     addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(Vec(guaranteeX, guaranteeY + 14.f), module, Phrasing::GUARANTEE_LIGHT_R));
 
     // addInput(createInputCentered<PJ301MPort>(Vec(densityX, 69.f), module, Phrasing::DENSITY_CV_INPUT));
@@ -473,10 +465,11 @@ struct Phrasing : Module {
         OUTPUTS_LEN
     };
     enum LightId {
-        LANE1_LIGHT,
-        LANE2_LIGHT,
-        LANE3_LIGHT,
-        LANE4_LIGHT,
+        LANE1_LIGHT_R, LANE1_LIGHT_G, LANE1_LIGHT_B,
+        LANE2_LIGHT_R, LANE2_LIGHT_G, LANE2_LIGHT_B,
+        LANE3_LIGHT_R, LANE3_LIGHT_G, LANE3_LIGHT_B,
+        LANE4_LIGHT_R, LANE4_LIGHT_G, LANE4_LIGHT_B,
+        GUARANTEE_LIGHT_R, GUARANTEE_LIGHT_G, GUARANTEE_LIGHT_B,
         LIGHTS_LEN
     };
 
@@ -521,10 +514,10 @@ struct Phrasing : Module {
         configOutput(OUT2_OUTPUT, "Lane CV II");
         configOutput(OUT3_OUTPUT, "Lane CV III");
         configOutput(OUT4_OUTPUT, "Lane CV IV");
-        configLight(LANE1_LIGHT, "Lane 1");
-        configLight(LANE2_LIGHT, "Lane 2");
-        configLight(LANE3_LIGHT, "Lane 3");
-        configLight(LANE4_LIGHT, "Lane 4");
+        configLight(LANE1_LIGHT_R, "Lane 1");
+        configLight(LANE2_LIGHT_R, "Lane 2");
+        configLight(LANE3_LIGHT_R, "Lane 3");
+        configLight(LANE4_LIGHT_R, "Lane 4");
     }
 
     json_t* dataToJson() override {
@@ -747,10 +740,24 @@ struct Phrasing : Module {
         }
 
         for (int i = 0; i < 4; i++) {
-            const float base = laneActive[i] ? 0.15f : 0.f;
-            const float activity = laneActive[i] ? laneValue[i] : 0.f;
-            lights[LANE1_LIGHT + i].setBrightness(std::max(base, activity));
+            const int r = LANE1_LIGHT_R + i * 3;
+            const int g = LANE1_LIGHT_G + i * 3;
+            const int b = LANE1_LIGHT_B + i * 3;
+            if (!laneActive[i]) {
+                lights[r].setBrightness(1.f);
+                lights[g].setBrightness(0.f);
+                lights[b].setBrightness(0.f);
+            } else {
+                const float brightness = laneValue[i];
+                lights[r].setBrightness(brightness);
+                lights[g].setBrightness(brightness);
+                lights[b].setBrightness(brightness);
+            }
         }
+
+        lights[GUARANTEE_LIGHT_R].setBrightness(guaranteeOne ? 1.f : 1.f);
+        lights[GUARANTEE_LIGHT_G].setBrightness(guaranteeOne ? 1.f : 0.f);
+        lights[GUARANTEE_LIGHT_B].setBrightness(guaranteeOne ? 1.f : 0.f);
     }
 };
 
@@ -784,6 +791,7 @@ struct PhrasingWidget : ModuleWidget {
         addParam(createParamCentered<RoundBlackKnob>(Vec(gapJitterX, globalY), module, Phrasing::GAP_JITTER_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(Vec(durJitterX, globalY), module, Phrasing::DURATION_JITTER_PARAM));
         addParam(createParamCentered<CKSS>(Vec(guaranteeX, globalY), module, Phrasing::GUARANTEE_ONE_PARAM));
+        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(Vec(guaranteeX, globalY + 20.f), module, Phrasing::GUARANTEE_LIGHT_R));
         addInput(createInputCentered<PJ301MPort>(Vec(densityX, globalY + 36.f), module, Phrasing::DENSITY_CV_INPUT));
 
         addParam(createParamCentered<TL1105>(Vec(lane1X, enY), module, Phrasing::LANE1_ACTIVE_PARAM));
@@ -791,10 +799,10 @@ struct PhrasingWidget : ModuleWidget {
         addParam(createParamCentered<TL1105>(Vec(lane3X, enY), module, Phrasing::LANE3_ACTIVE_PARAM));
         addParam(createParamCentered<TL1105>(Vec(lane4X, enY), module, Phrasing::LANE4_ACTIVE_PARAM));
 
-        addChild(createLightCentered<MediumLight<GreenLight>>(Vec(lane1X, lightY), module, Phrasing::LANE1_LIGHT));
-        addChild(createLightCentered<MediumLight<GreenLight>>(Vec(lane2X, lightY), module, Phrasing::LANE2_LIGHT));
-        addChild(createLightCentered<MediumLight<GreenLight>>(Vec(lane3X, lightY), module, Phrasing::LANE3_LIGHT));
-        addChild(createLightCentered<MediumLight<GreenLight>>(Vec(lane4X, lightY), module, Phrasing::LANE4_LIGHT));
+        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(Vec(lane1X, lightY), module, Phrasing::LANE1_LIGHT_R));
+        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(Vec(lane2X, lightY), module, Phrasing::LANE2_LIGHT_R));
+        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(Vec(lane3X, lightY), module, Phrasing::LANE3_LIGHT_R));
+        addChild(createLightCentered<MediumLight<RedGreenBlueLight>>(Vec(lane4X, lightY), module, Phrasing::LANE4_LIGHT_R));
 
         addParam(createParamCentered<RoundBlackKnob>(Vec(lane1X, weightY), module, Phrasing::WEIGHT1_PARAM));
         addParam(createParamCentered<RoundBlackKnob>(Vec(lane2X, weightY), module, Phrasing::WEIGHT2_PARAM));
