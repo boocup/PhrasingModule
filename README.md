@@ -89,7 +89,10 @@ See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 Clone into `plugins/` directory and run:
 ```bash
 make
+make install
 ```
+
+`make install` builds a distributable `.vcvplugin` and copies it into your Rack plugins folder.
 
 ### 4ms MetaModule
 Requires the [MetaModule Plugin SDK](https://github.com/4ms/metamodule-plugin-sdk).
