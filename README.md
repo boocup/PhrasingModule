@@ -9,6 +9,8 @@
 **THEREELPEET** Phrasing and presence controller. Shapes rests, repeats, changes, and level-focused dynamics; intended to drive VCAs or Morph 4-style level CV inputs.  
 It produces long, breathing phrases — extended rests interrupted by smooth, musical rises and falls — to control presence, spotlighting, and dynamic emphasis across voices.
 
+Runs natively on both VCV Rack 2 and the 4ms MetaModule from a single codebase.
+
 Not a sequencer. Not a trigger module.  
 A form and breathing tool meant to sit above your sound generators.
 
@@ -79,18 +81,22 @@ Best results with modules that accept unipolar 0–5/0–8/0–10 V CV and respo
 Best with modules that accept unipolar CV and respond musically to slow changes.
 
 ## Building
+
+### VCV Rack
 Requires a working VCV Rack plugin development environment.  
 See: https://vcvrack.com/manual/PluginDevelopmentTutorial
 
 Clone into `plugins/` directory and run:
 ```bash
 make
+```
 
+### 4ms MetaModule
+Requires the [MetaModule Plugin SDK](https://github.com/4ms/metamodule-plugin-sdk).
 
+```bash
+cmake -S . -B build-mm -DMETAMODULE_SDK_DIR=/path/to/metamodule-plugin-sdk
+cmake --build build-mm
+```
 
-
-
-
-
-
-
+Produces `metamodule-plugins/phrasing-module.mmplugin` — copy to the MetaModule's plugin folder.
