@@ -29,6 +29,12 @@ target_sources(PhrasingModule PRIVATE
 
 target_include_directories(PhrasingModule PRIVATE src)
 
+# Selects the PNG faceplate path in src/Phrasing.cpp -- MM's module-browser
+# thumbnail requires a raster image, confirmed on physical hardware.
+target_compile_definitions(PhrasingModule PRIVATE
+    METAMODULE
+)
+
 # ====================== Create Plugin ======================
 create_plugin(
     SOURCE_LIB PhrasingModule
